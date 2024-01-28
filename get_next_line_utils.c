@@ -6,50 +6,52 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/23 13:37:06 by lprieri       #+#    #+#                 */
-/*   Updated: 2023/11/23 17:49:23 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/01/28 16:52:23 by lisandro      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strdup(char const *str)
-{
-	char	*new;
-	ssize_t	len;
-	ssize_t	i;
+// char	*gnl_strdup(char const *str)
+// {
+// 	char	*new;
+// 	ssize_t	len;
+// 	ssize_t	i;
 
-	len = ft_strlen((char *) str);
-	new = malloc (len + 1);
-	if (!new)
-		return (NULL);
-	i = 0;
-	while (str && str[i] && i < len)
-	{
-		new[i] = str[i];
-		i++;
-	}
-	new[i] = '\0';
-	return (new);
-}
+// 	len = gnl_strlen((char *) str);
+// 	new = malloc (len + 1);
+// 	if (!new)
+// 		return (gnl_free((char **) &str));
+// 	i = 0;
+// 	while (str && str[i] && i < len)
+// 	{
+// 		new[i] = str[i];
+// 		i++;
+// 	}
+// 	new[i] = '\0';
+// 	return (new);
+// }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*gnl_strjoin(char const *s1, char const *s2)
 {
 	char	*str;
 	ssize_t	len_s1;
 	ssize_t	len_s2;
 	ssize_t	i;
 
-	len_s1 = ft_strlen((char *) s1);
-	len_s2 = ft_strlen((char *) s2);
+	len_s1 = gnl_strlen((char *) s1);
+	len_s2 = gnl_strlen((char *) s2);
 	str = malloc (len_s1 + len_s2 + 1);
 	if (!str)
-		return (NULL);
+		return (gnl_free(&str),	NULL);
 	i = 0;
 	while (s1 && s1[i] && i < len_s1)
 	{
 		str[i] = s1[i];
 		i++;
 	}
+	if (s1)
+		gnl_free((char **) &s1);
 	i = 0;
 	while (s2 && s2[i] && i < len_s2)
 	{
@@ -60,24 +62,26 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-ssize_t	ft_strlen(char *str)
+ssize_t	gnl_strlen(char *str)
 {
 	ssize_t	i;
 
 	i = 0;
+	if (str == NULL)
+		return (0);
 	while (str && str[i])
 		i++;
 	return (i);
 }
 
-ssize_t	ft_checknl(char *str)
+ssize_t	gnl_checknl(char *str)
 {
 	ssize_t	i;
 
-	if (str == NULL)
+	if (str == NULL || str[0] == '\0')
 		return (-1);
 	i = 0;
-	while (str[i])
+	while (str != NULL && str[i] != '\0')
 	{
 		if (str[i] == '\n')
 			return (i);
@@ -86,11 +90,41 @@ ssize_t	ft_checknl(char *str)
 	return (-1);
 }
 
-void	ft_free(char **str)
+char	*gnl_free(char **str)
 {
-	if (str && *str)
+	if (str != NULL && *str != NULL)
 	{
 		free (*str);
 		*str = NULL;
 	}
+	else
+		*str = NULL;
+	return (NULL);
+}
+
+char	*gnl_substr(char const *s, unsigned int start, size_t len)
+{
+	char	*str;
+	size_t	s_len;
+	size_t	i;
+
+	s_len = gnl_strlen((char *) s);
+	if (start > s_len)
+	{
+		start = s_len;
+		len = 0;
+	}
+	if (len + start > s_len)
+		len = s_len - start;
+	str = (char *) malloc(len + 1);
+	if (!str)
+		return (gnl_free((char **) &s));
+	i = 0;
+	while (s[start + i] && i < len)
+	{
+		str[i] = s[start + i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
 }

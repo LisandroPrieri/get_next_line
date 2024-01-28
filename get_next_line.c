@@ -6,26 +6,35 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/23 13:31:36 by lprieri       #+#    #+#                 */
-/*   Updated: 2023/11/23 17:49:08 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/01/28 16:50:15 by lisandro      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+static char	*gnl_parse(char **rem, char **line, int nl_pos);
+static char	*gnl_read(char **rem, char **line, int fd);
+
 // int	main(void)
 // {
 // 	int		fd;
 // 	char	*str;
+// 	int		i;
 
-// 	fd = open("test1.txt", O_RDONLY);
+// 	fd = open("test.txt", O_RDONLY);
 // 	str = get_next_line(fd);
-// 	while (str)
+// 	printf("GNL CALL 0: %s", str);
+// 	i = 1;
+// 	while (i < 10)
 // 	{
-// 		printf("%s", str);
-// 		ft_free(&str);
+// 		gnl_free(&str);
 // 		str = get_next_line(fd);
+// 		printf("GNL CALL %i: %s", i, str);
+// 		i++;
 // 	}
-// 	ft_free(&str);
+// 	gnl_free(&str);
+// 	str = get_next_line(fd);
+// 	printf("\nGNL CALL 3: %s", str);
 // 	close(fd);
 // }
 
@@ -34,126 +43,69 @@ char	*get_next_line(int fd)
 	static char	*rem = NULL;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, NULL, 0) < 0)
-	{
-		ft_free (&rem);
-		return (NULL);
-	}
-	line = NULL;
-	if (rem && ft_checknl(rem) >= 0)
-		return (ft_parse(&rem, &line));
-	ft_read(fd, &rem);
-	if (rem && ft_checknl(rem) >= 0)
-		return (ft_parse(&rem, &line));
-	else if (rem && rem[0] == '\0')
-	{
-		ft_free(&rem);
-		return (NULL);
-	}
-	else
-	{
-		line = ft_strdup(rem);
-		ft_free(&rem);
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+		return (line = NULL, gnl_free (&rem));
+	if (rem && gnl_checknl(rem) >= 0)
+		return (gnl_parse(&rem, &line, gnl_checknl(rem)));
+	gnl_read(&rem, &line, fd);
+	if (line && *line)
 		return (line);
-	}
+	else if (rem && rem[0] == '\0')
+		return (gnl_free(&rem));
+	else
+		return (rem);
 }
 
-void	ft_read(int fd, char **rem)
+static char	*gnl_read(char **rem, char **line, int fd)
 {
 	char	*buffer;
-	ssize_t	bytes_read;
-	char	*temp;
+	int		bytes_read;
 
-	buffer = malloc (BUFFER_SIZE + 1);
+	buffer = (char *) malloc(BUFFER_SIZE + 1);
 	if (!buffer)
-		return ;
+	{
+		if (*rem)
+			return (gnl_free(rem));
+		return (NULL);
+	}
 	buffer[0] = '\0';
 	bytes_read = 1;
-	while (bytes_read > 0 && ft_checknl(buffer) < 0)
+	while (bytes_read > 0 && gnl_checknl(buffer) < 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
-			ft_free(rem);
-			ft_free(&buffer);
-			return ;
+			if (*rem)
+				gnl_free(rem);
+			return (gnl_free(&buffer));
 		}
 		buffer[bytes_read] = '\0';
-		temp = ft_strjoin(*rem, buffer);
-		ft_free(rem);
-		*rem = ft_strdup(temp);
-		ft_free(&temp);
+		*rem = gnl_strjoin(*rem, buffer);
 	}
-	ft_free(&buffer);
+	return (gnl_free(&buffer), gnl_parse(rem, line, gnl_checknl(*rem)));
 }
 
-// void	ft_append(char *buffer, char **rem)
-// {
-// 	char	*temp;
-
-// 	temp = ft_strjoin(*rem, buffer);
-// 	ft_free(rem);
-// 	*rem = ft_strdup(temp);
-// 	ft_free(&temp);
-// }
-
-char	*ft_parse(char **rem, char **line)
-{
-	char	*temp;
-
-	temp = ft_get_remainder(*rem);
-	*line = ft_get_nl_line(rem);
-	ft_free(rem);
-	*rem = ft_strdup(temp);
-	ft_free(&temp);
-	return (*line);
-}
-
-char	*ft_get_remainder(char *rem)
+static char	*gnl_parse(char **rem, char **line, int nl_pos)
 {
 	char	*new_rem;
-	ssize_t	nl_index;
-	ssize_t	rem_len;
-	ssize_t	i;
 
-	nl_index = ft_checknl(rem);
-	rem_len = ft_strlen(rem);
-	new_rem = malloc (rem_len - nl_index + 1);
-	if (!new_rem)
+	if (!rem || !*rem)
 		return (NULL);
-	i = 0;
-	while (rem && rem[i] && i < (rem_len - nl_index))
+	if (!rem || (*rem && nl_pos < 0))
 	{
-		new_rem[i] = rem[nl_index + 1 + i];
-		i++;
+		nl_pos = gnl_strlen(*rem);
+		if (nl_pos == 0)
+			return (gnl_free(rem), *line = NULL);
 	}
-	new_rem[i] = '\0';
-	return (new_rem);
-}
-
-char	*ft_get_nl_line(char **rem)
-{
-	char	*line;
-	ssize_t	line_len;
-	ssize_t	i;
-
-	line_len = ft_checknl(*rem);
-	if (line_len < 0 && !(*rem))
-		return (NULL);
-	line = malloc(line_len + 2);
-	if (!line)
-		return (NULL);
-	i = 0;
-	while (*rem && (*rem)[i] && i < line_len)
-	{
-		line[i] = (*rem)[i];
-		i++;
-	}
-	if (*rem && (*rem)[i] && (*rem)[i] == '\n')
-	{
-		line[i] = (*rem)[i];
-		i++;
-	}
-	line[i] = '\0';
-	return (line);
+	*line = gnl_substr(*rem, 0, nl_pos + 1);
+	if (!line || *line == NULL)
+		return (gnl_free(rem));
+	else if (!rem || (*rem && gnl_checknl(*rem) < 0))
+		return (gnl_free(rem), *line);
+	else
+		new_rem = gnl_substr(*rem, nl_pos + 1, gnl_strlen(*rem) - nl_pos + 1);
+	gnl_free(rem);
+	if (new_rem == NULL)
+		return (gnl_free(line));
+	return (*rem = new_rem, *line);
 }
