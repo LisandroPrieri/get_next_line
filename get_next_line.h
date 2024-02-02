@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/23 13:34:05 by lprieri       #+#    #+#                 */
-/*   Updated: 2023/11/23 17:48:32 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/02/02 18:45:10 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,13 @@
 
 /* GNL */
 char	*get_next_line(int fd);
-void	ft_read(int fd, char **rem);
-// void	ft_append(char *buffer, char **rem);
-char	*ft_parse(char **rem, char **line);
-char	*ft_get_remainder(char *rem);
-char	*ft_get_nl_line(char **rem);
 
 /* UTILS */
-char	*ft_strdup(char const *str);
-char	*ft_strjoin(char const *s1, char const *s2);
-ssize_t	ft_strlen(char *str);
-ssize_t	ft_checknl(char *str);
-void	ft_free(char **str);
+char	*gnl_substr(char const *s, unsigned int start, size_t len);
+char	*gnl_free(char **str);
+char	*gnl_strjoin(char const *s1, char const *s2);
+ssize_t	gnl_strlen(char *str);
+ssize_t	gnl_checknl(char *str); 
+
 
 #endif

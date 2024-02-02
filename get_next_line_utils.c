@@ -6,7 +6,7 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/23 13:37:06 by lprieri       #+#    #+#                 */
-/*   Updated: 2024/01/28 16:52:23 by lisandro      ########   odam.nl         */
+/*   Updated: 2024/02/02 18:26:47 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*gnl_strjoin(char const *s1, char const *s2)
 	len_s2 = gnl_strlen((char *) s2);
 	str = malloc (len_s1 + len_s2 + 1);
 	if (!str)
-		return (gnl_free(&str),	NULL);
+		return (gnl_free(&str), NULL);
 	i = 0;
 	while (s1 && s1[i] && i < len_s1)
 	{

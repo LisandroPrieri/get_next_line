@@ -6,21 +6,21 @@
 /*   By: lprieri <lprieri@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/11/24 12:34:32 by lprieri       #+#    #+#                 */
-/*   Updated: 2023/11/24 14:57:35 by lprieri       ########   odam.nl         */
+/*   Updated: 2024/02/02 18:13:14 by lprieri       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*gnl_strjoin(char const *s1, char const *s2)
 {
 	char	*str;
 	ssize_t	len_s1;
 	ssize_t	len_s2;
 	ssize_t	i;
 
-	len_s1 = ft_strlen((char *) s1);
-	len_s2 = ft_strlen((char *) s2);
+	len_s1 = gnl_strlen((char *) s1);
+	len_s2 = gnl_strlen((char *) s2);
 	str = malloc (len_s1 + len_s2 + 1);
 	if (!str)
 		return (NULL);
@@ -40,7 +40,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-ssize_t	ft_checknl(char *str)
+ssize_t	gnl_checknl(char *str)
 {
 	ssize_t	i;
 
@@ -56,13 +56,13 @@ ssize_t	ft_checknl(char *str)
 	return (-1);
 }
 
-char	*ft_strdup(char const *str)
+char	*gnl_strdup(char const *str)
 {
 	char	*new;
 	ssize_t	len;
 	ssize_t	i;
 
-	len = ft_strlen((char *) str);
+	len = gnl_strlen((char *) str);
 	new = malloc (len + 1);
 	if (!new)
 		return (NULL);
@@ -76,7 +76,7 @@ char	*ft_strdup(char const *str)
 	return (new);
 }
 
-ssize_t	ft_strlen(char *str)
+ssize_t	gnl_strlen(char *str)
 {
 	ssize_t	i;
 
@@ -86,7 +86,7 @@ ssize_t	ft_strlen(char *str)
 	return (i);
 }
 
-void	ft_free(int fd, char **arr)
+void	gnl_free(int fd, char **arr)
 {
 	if (arr[fd])
 	{
